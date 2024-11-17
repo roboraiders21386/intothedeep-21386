@@ -1,11 +1,14 @@
 package org.firstinspires.ftc.teamcode.opmodes.autonomous;
 
+import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.SECONDS;
+
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
@@ -48,11 +51,13 @@ public class AutonomousIteration1 extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         specimen = hardwareMap.get(Servo.class, "specimen");
         Lift = hardwareMap.get(DcMotor.class, "lift");
+        Lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Lift.setDirection(DcMotor.Direction.REVERSE);
 
-       //selectStartingPosition();
-       // telemetry.addData("Selected Starting Position", startPosition);
+       selectStartingPosition();
+       //telemetry.addData("Selected Starting Position", startPosition);
 
-        startPosition = START_POSITION.RED_RIGHT;
+        //startPosition = START_POSITION.RED_RIGHT;
 
         while (!isStopRequested() && !opModeIsActive()) {
             telemetry.addData("Selected Starting Position", startPosition);
@@ -64,7 +69,7 @@ public class AutonomousIteration1 extends LinearOpMode {
         }
     }
 
-  /*  public void selectStartingPosition() {
+    public void selectStartingPosition() {
         telemetry.setAutoClear(true);
         telemetry.clearAll();
         //******select start pose*****
@@ -103,7 +108,7 @@ public class AutonomousIteration1 extends LinearOpMode {
 
     }
 
-   */
+
 
 
 
@@ -152,55 +157,87 @@ public class AutonomousIteration1 extends LinearOpMode {
 
            case RED_RIGHT:
                drive = new MecanumDrive(hardwareMap, initPose);
-               specimenDropPose = new Pose2d(15, 24, Math.toRadians(0));
-               midwayPose1 = new Pose2d(15, 18, Math.toRadians(0));
-               parkPose = new Pose2d(48,0,Math.toRadians(0));
+               specimenDropPose = new Pose2d(28,10,0);
+               midwayPose1 = new Pose2d(20, 5, Math.toRadians(0));
+               midwayPose2 = new Pose2d(10, -18, Math.toRadians(45));
+               parkPose = new Pose2d(0, -36, Math.toRadians(90));
+               //specimenDropPose = new Pose2d(15, 24, Math.toRadians(0));
+               //midwayPose1 = new Pose2d(15, 18, Math.toRadians(0));
+               //parkPose = new Pose2d(48,0,Math.toRadians(0));
                break;
 
 
        }
 
+       //Move to midwayPose1
        Actions.runBlocking(
                drive.actionBuilder(drive.pose)
                        .strafeToLinearHeading(midwayPose1.position, midwayPose1.heading)
                        .build());
-        /*
 
-        Lift.setTargetPosition(2000);
-        Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        Lift.setPower(liftPow);
+       safeWaitSeconds((0.5));
 
-         */
+       //TODO : Code to raise slide and drop specimen
+       Lift.setTargetPosition(2000);
+       Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+       Lift.setPower(liftPow);
 
-//        Actions.runBlocking(
-//                drive.actionBuilder(drive.pose)
-//                        .strafeToLinearHeading(specimenDropPose.position, specimenDropPose.heading)
-//                        .build());
-        /*
+       safeWaitSeconds(0.5);
+       Lift.setPower(0);
 
-        Lift.setTargetPosition(1800);
-        Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        Lift.setPower(0.1);
-        specimen.setPosition(OPEN_CLAW);
+       //Move to specimenDropPose
+       Actions.runBlocking(
+               drive.actionBuilder(drive.pose)
+                       .strafeToLinearHeading(specimenDropPose.position, specimenDropPose.heading)
+                       .build());
 
-         */
+       safeWaitSeconds(0.5);
 
-//        Actions.runBlocking(
-//                drive.actionBuilder(drive.pose)
-//                        .strafeToLinearHeading(midwayPose1.position, midwayPose1.heading)
-//                        .build());
-        /*
+       Lift.setTargetPosition(1900);
+       Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+       Lift.setPower(0.1);
 
-        Lift.setTargetPosition(0);
-        Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        Lift.setPower(liftPow);
+       safeWaitSeconds(0.5);
 
-         */
+       specimen.setPosition(OPEN_CLAW);
 
-//        Actions.runBlocking(
-//                drive.actionBuilder(drive.pose)
-//                        .strafeToLinearHeading(parkPose.position, parkPose.heading)
-//                        .build());
+
+       //Move robot to midwayPose1
+       Actions.runBlocking(
+               drive.actionBuilder(drive.pose)
+                       .strafeToLinearHeading(midwayPose2.position, midwayPose2.heading)
+                       .build());
+
+
+       safeWaitSeconds(0.5);
+
+       //Bring the lift down
+       Lift.setTargetPosition(0);
+       Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+       Lift.setPower(liftPow);
+
+       safeWaitSeconds(0.5);
+
+       //Move robot to park in Backstage
+       Actions.runBlocking(
+               drive.actionBuilder(drive.pose)
+                       //TODO: after specimen go here
+                       .strafeToLinearHeading(parkPose.position, parkPose.heading)
+                       .build());
+
+
    }
 
+    //method to wait safely with stop button working if needed. Use this instead of sleep
+    public void safeWaitSeconds(double time) {
+        ElapsedTime timer = new ElapsedTime(SECONDS);
+        timer.reset();
+        while (!isStopRequested() && timer.time() < time) {
+        }
+    }
+
 }
+
+
+
+

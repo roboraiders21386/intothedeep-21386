@@ -44,8 +44,8 @@ import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
 /**
  * Autonomous  for only vision detection using OpenCV VisionPortal and park
  */
-@Autonomous(name = "AutonRedRight", group = "00-Autonomous", preselectTeleOp = "RR TeleOp")
-public class RED_RIGHT extends LinearOpMode {
+@Autonomous(name = "Auton-Right", group = "00-Autonomous", preselectTeleOp = "TeleOpPS5")
+public class AUTON_RIGHT extends LinearOpMode {
 
     public static String TEAM_NAME = "Tx-Rx"; //TODO: Enter team Name
     public static int TEAM_NUMBER = 21386; //TODO: Enter team Number
@@ -53,8 +53,8 @@ public class RED_RIGHT extends LinearOpMode {
     private Servo specimen;
     private DcMotor Lift;
     private int SPECIMEN_LIFT = 2000;
-    private double OPEN_CLAW = 0.8;
-    private double CLOSE_CLAW = 0.5;
+    private double OPEN_SPECIMEN_CLAW = 0.5;
+    private double CLOSE_SPECIMEN_CLAW = 0.8;
     private double liftPow = 0.5;
 
     //Define and declare Robot Starting Locations
@@ -66,19 +66,17 @@ public class RED_RIGHT extends LinearOpMode {
     }
     public static START_POSITION startPosition;
 
-    public enum IDENTIFIED_SPIKE_MARK_LOCATION {
-        LEFT,
-        MIDDLE,
-        RIGHT
-    }
-   //public static IDENTIFIED_SPIKE_MARK_LOCATION identifiedSpikeMarkLocation = IDENTIFIED_SPIKE_MARK_LOCATION.LEFT;
 
     @Override
     public void runOpMode() throws InterruptedException {
 
+        //Servo: Specimen claw
         specimen = hardwareMap.get(Servo.class, "specimen");
-        Lift = hardwareMap.get(DcMotor.class, "lift");
 
+        //Lift: Initialize lift
+        Lift = hardwareMap.get(DcMotor.class, "lift");
+        Lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Lift.setDirection(DcMotor.Direction.REVERSE);
 
         //Key Pay inputs to selecting Starting Position of robot
 
@@ -94,53 +92,81 @@ public class RED_RIGHT extends LinearOpMode {
 
     public void runAutonoumousMode() {
         //Initialize Pose2d as desired
+        //For Robot-centric ts
         Pose2d initPose = new Pose2d(0, 0, 0); // Starting Pose
         Pose2d specimenDropPose = new Pose2d(0,0,0);
-        Pose2d dropPurplePixelPose = new Pose2d(0, 0, 0);
         Pose2d midwayPose1 = new Pose2d(0,0,0);
-        Pose2d midwayPose1a = new Pose2d(0,0,0);
-        Pose2d intakeStack = new Pose2d(0,0,0);
         Pose2d midwayPose2 = new Pose2d(0,0,0);
-        Pose2d dropYellowPixelPose = new Pose2d(0, 0, 0);
-        Pose2d dropYellowPixelPosea = new Pose2d(0, 0, 0);
         Pose2d parkPose = new Pose2d(0,0, 0);
         double waitSecondsBeforeDrop = 0;
         MecanumDrive drive = new MecanumDrive(hardwareMap, initPose);
 
+        //initPose -> midwayPose 1 -> specimenDropPose -> midwayPose2 -> parkPose
         initPose = new Pose2d(0, 0, Math.toRadians(0)); //Starting pose
-        specimenDropPose = new Pose2d(28,10,0);
+        midwayPose1 = new Pose2d(20, 5, Math.toRadians(0));
+        specimenDropPose = new Pose2d(30,10,0); //changed from 28 to 30
+        midwayPose2 = new Pose2d(10, -18, Math.toRadians(45));
+        waitSecondsBeforeDrop = 2; //TODO: Adjust time to wait for alliance partner to move from board
+        parkPose = new Pose2d(5, -50, Math.toRadians(0));  //changed from 90 to 0 to face forward
 
+        drive = new MecanumDrive(hardwareMap, initPose);
 
-                drive = new MecanumDrive(hardwareMap, initPose);
+        //Start with the Specimen claw closed
+        specimen.setPosition(CLOSE_SPECIMEN_CLAW);
 
-                midwayPose1 = new Pose2d(20, 5, Math.toRadians(0));
-                midwayPose2 = new Pose2d(10, -18, Math.toRadians(45));
-                waitSecondsBeforeDrop = 2; //TODO: Adjust time to wait for alliance partner to move from board
-                parkPose = new Pose2d(0, -36, Math.toRadians(90));
-
-
-        //Move robot to dropPurplePixel based on identified Spike Mark Location
+        //Move to midwayPose1
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         .strafeToLinearHeading(midwayPose1.position, midwayPose1.heading)
                         .build());
+        
+        safeWaitSeconds((0.5));
 
         //TODO : Code to raise slide and drop specimen
         Lift.setTargetPosition(2000);
         Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         Lift.setPower(liftPow);
+        while (Lift.isBusy()) {
+            telemetry.addData("Current Position", Lift.getCurrentPosition());
+            telemetry.addData("Target Position", Lift.getTargetPosition());
+            telemetry.update();
+        }
         safeWaitSeconds(0.5);
+        //Lift.setPower(0);
 
+        //Move to specimenDropPose
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         .strafeToLinearHeading(specimenDropPose.position, specimenDropPose.heading)
                         .build());
 
-        sleep(500);
+        safeWaitSeconds(0.5);
+
+        //Lower lift
         Lift.setTargetPosition(1800);
         Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         Lift.setPower(0.1);
-        specimen.setPosition(OPEN_CLAW);
+        while (Lift.isBusy()) {
+            telemetry.addData("Current Position", Lift.getCurrentPosition());
+            telemetry.addData("Target Position", Lift.getTargetPosition());
+            telemetry.update();
+        }
+        safeWaitSeconds(0.5);
+
+        //Lower lift
+        Lift.setTargetPosition(1500);
+        Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        Lift.setPower(0.1);
+        while (Lift.isBusy()) {
+            telemetry.addData("Current Position", Lift.getCurrentPosition());
+            telemetry.addData("Target Position", Lift.getTargetPosition());
+            telemetry.update();
+        }
+        safeWaitSeconds(0.5);
+
+        specimen.setPosition(OPEN_SPECIMEN_CLAW);
+
+        safeWaitSeconds(0.5);
 
 
         //Move robot to midwayPose1
@@ -150,7 +176,20 @@ public class RED_RIGHT extends LinearOpMode {
                         .build());
 
 
+        safeWaitSeconds(0.5);
 
+        //Bring the lift down
+        Lift.setTargetPosition(0);
+        Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        Lift.setPower(liftPow);
+        while (Lift.isBusy()) {
+            telemetry.addData("Current Position", Lift.getCurrentPosition());
+            telemetry.addData("Target Position", Lift.getTargetPosition());
+            telemetry.update();
+        }
+        safeWaitSeconds(0.5);
+        //close claw - or leave it open
+        //specimen.setPosition(CLOSE_SPECIMEN_CLAW);
 
         //Move robot to park in Backstage
         Actions.runBlocking(
@@ -160,10 +199,9 @@ public class RED_RIGHT extends LinearOpMode {
                         .build());
 
 
-    }
+    } // runAutonoumousMode
 
-
-            //method to wait safely with stop button working if needed. Use this instead of sleep
+    //method to wait safely with stop button working if needed. Use this instead of sleep
     public void safeWaitSeconds(double time) {
         ElapsedTime timer = new ElapsedTime(SECONDS);
         timer.reset();

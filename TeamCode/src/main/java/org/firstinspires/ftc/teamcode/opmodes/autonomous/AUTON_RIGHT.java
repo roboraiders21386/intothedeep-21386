@@ -52,12 +52,13 @@ public class AUTON_RIGHT extends LinearOpMode {
 
     private Servo specimen;
     private DcMotor Lift;
+    private DcMotor Lift2;
     private Servo Rotation;
     private Servo sample;
     private Servo Wrist;
     private int SPECIMEN_LIFT = 2000;
     private double OPEN_SPECIMEN_CLAW = 0.5;
-    private double CLOSE_SPECIMEN_CLAW = 0.8;
+    private double CLOSE_SPECIMEN_CLAW = 0.77;
     private double liftPow = 0.5;
 
     //Define and declare Robot Starting Locations
@@ -85,6 +86,10 @@ public class AUTON_RIGHT extends LinearOpMode {
         Lift = hardwareMap.get(DcMotor.class, "lift");
         Lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Lift.setDirection(DcMotor.Direction.REVERSE);
+        //Lift2: Initialize
+        Lift2 = hardwareMap.get(DcMotor.class, "lift2");
+        Lift2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Lift2.setDirection(DcMotor.Direction.FORWARD);
 
         //Key Pay inputs to selecting Starting Position of robot
 
@@ -114,79 +119,51 @@ public class AUTON_RIGHT extends LinearOpMode {
         //initPose -> midwayPose 1 -> specimenDropPose -> midwayPose2 -> parkPose
         initPose = new Pose2d(0, 0, Math.toRadians(0)); //Starting pose
         midwayPose1 = new Pose2d(20, 5, Math.toRadians(0));
-        specimenDropPose = new Pose2d(30,10,0); //changed from 28 to 30
+        specimenDropPose = new Pose2d(31,10,0); //changed from 28 to 30
         midwayPose2 = new Pose2d(10, -12, Math.toRadians(0));
-        pickSamplePose = new Pose2d(52.25,-35, Math.toRadians(180));
-        Pose2d pickSamplePose2 = new Pose2d(52.25,-38.5, Math.toRadians(180));
+        pickSamplePose = new Pose2d(55,-35, Math.toRadians(180));
+        Pose2d pickSamplePose2 = new Pose2d(55,-38.5, Math.toRadians(180));
         pickSpecimen = new Pose2d(4,-45.5 , Math.toRadians(180));
+        Pose2d pickSpecimenPose2 = new Pose2d(8,-45.5 , Math.toRadians(180));
         waitSecondsBeforeDrop = 2; //TODO: Adjust time to wait for alliance partner to move from board
         parkPose = new Pose2d(5, -50, Math.toRadians(0));  //changed from 90 to 0 to face forward
         Pose2d specimenDropPose2 = new Pose2d(24.5, 15, 0);
         drive = new MecanumDrive(hardwareMap, initPose);
         Pose2d specimenDropPose3 = new Pose2d(29.5, 15, 0);
 
-        //Start with the Specimen claw closed
+        //Start with the Specimen claw closed and Rotation set
         specimen.setPosition(CLOSE_SPECIMEN_CLAW);
+        Rotation.setPosition(0);
 
+        safeWaitSeconds(0.5);
+        dropSpecimen();
         //Move to midwayPose1
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         .strafeToLinearHeading(midwayPose1.position, midwayPose1.heading)
                         .build());
-        
-        safeWaitSeconds((0.5));
 
-        //TODO : Code to raise slide and drop specimen
-        Lift.setTargetPosition(2000);
-        Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        Lift.setPower(liftPow);
-        while (Lift.isBusy()) {
-            telemetry.addData("Current Position", Lift.getCurrentPosition());
-            telemetry.addData("Target Position", Lift.getTargetPosition());
-            telemetry.update();
-        }
-        safeWaitSeconds(0.5);
         //Lift.setPower(0);
+
 
         //Move to specimenDropPose
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         .strafeToLinearHeading(specimenDropPose.position, specimenDropPose.heading)
                         .build());
-
-        safeWaitSeconds(0.5);
-
-        //Lower lift
-        Lift.setTargetPosition(1500);
-        Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        Lift.setPower(0.1);
-        while (Lift.isBusy()) {
-            telemetry.addData("Current Position", Lift.getCurrentPosition());
-            telemetry.addData("Target Position", Lift.getTargetPosition());
-            telemetry.update();
-        }
-        safeWaitSeconds(0.5);
+        lowerLift();
+        safeWaitSeconds(2);
 
         specimen.setPosition(OPEN_SPECIMEN_CLAW);
 
 
+        bringliftDown();
 
         //Move robot to midwayPose1
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         .strafeToLinearHeading(midwayPose2.position, midwayPose2.heading)
                         .build());
-
-        //Bring the lift down
-        Lift.setTargetPosition(0);
-        Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        Lift.setPower(liftPow);
-        while (Lift.isBusy()) {
-            telemetry.addData("Current Position", Lift.getCurrentPosition());
-            telemetry.addData("Target Position", Lift.getTargetPosition());
-            telemetry.update();
-        }
-
 
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
@@ -201,40 +178,30 @@ public class AUTON_RIGHT extends LinearOpMode {
                 drive.actionBuilder(drive.pose)
                         .strafeToLinearHeading(pickSpecimen.position, pickSpecimen.heading)
                         .build());
+        Actions.runBlocking(
+                drive.actionBuilder(drive.pose)
+                        .strafeToLinearHeading(pickSpecimenPose2.position, pickSpecimenPose2.heading)
+                        .build());
         safeWaitSeconds(1);
 
         specimen.setPosition(CLOSE_SPECIMEN_CLAW);
-
+        dropSpecimen();
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         //TODO: DROP SPECIMEN
                         .strafeToLinearHeading(specimenDropPose2.position, specimenDropPose2.heading)
                         .build());
 
-        //TODO : Code to raise slide and drop specimen
-        Lift.setTargetPosition(2000);
-        Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        Lift.setPower(liftPow);
-        while (Lift.isBusy()) {
-            telemetry.addData("Current Position", Lift.getCurrentPosition());
-            telemetry.addData("Target Position", Lift.getTargetPosition());
-            telemetry.update();
-        }
+
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         //TODO: DROP SPECIMEN
                         .strafeToLinearHeading(specimenDropPose3.position, specimenDropPose3.heading)
                         .build());
-        safeWaitSeconds(0.5);
-        //Lower lift
-        Lift.setTargetPosition(1500);
-        Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        Lift.setPower(0.1);
-        while (Lift.isBusy()) {
-            telemetry.addData("Current Position", Lift.getCurrentPosition());
-            telemetry.addData("Target Position", Lift.getTargetPosition());
-            telemetry.update();
-        }
+
+        safeWaitSeconds(0.25);
+        lowerLift();
+        specimen.setPosition(OPEN_SPECIMEN_CLAW);
 
         //Move robot to park in Backstage
         Actions.runBlocking(
@@ -243,15 +210,9 @@ public class AUTON_RIGHT extends LinearOpMode {
                         .strafeToLinearHeading(midwayPose2.position, midwayPose2.heading)
                         .build());
 
-        //Bring the lift down
-        Lift.setTargetPosition(0);
-        Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        Lift.setPower(liftPow);
-        while (Lift.isBusy()) {
-            telemetry.addData("Current Position", Lift.getCurrentPosition());
-            telemetry.addData("Target Position", Lift.getTargetPosition());
-            telemetry.update();
-        }
+        bringliftDown();
+
+        specimen.setPosition(CLOSE_SPECIMEN_CLAW);
 
         //Move robot to park in Backstage
         Actions.runBlocking(
@@ -270,5 +231,53 @@ public class AUTON_RIGHT extends LinearOpMode {
         while (!isStopRequested() && timer.time() < time) {
         }
     }
-
+    //lift functions
+    public void dropSpecimen(){
+        //TODO : Code to raise slide and drop specimen
+        Lift.setTargetPosition(2000);
+        Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        Lift.setPower(liftPow);
+        Lift2.setTargetPosition(2000);
+        Lift2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        Lift2.setPower(-1 * liftPow);
+        //while (Lift.isBusy()) {
+        telemetry.addData("Current Position", Lift.getCurrentPosition());
+        telemetry.addData("Target Position", Lift.getTargetPosition());
+        telemetry.addData("Current Position", Lift2.getCurrentPosition());
+        telemetry.addData("Target Position", Lift2.getTargetPosition());
+        telemetry.update();
+        //}
+    }
+    public void lowerLift(){
+        //Lower lift
+        Lift.setTargetPosition(1150);
+        Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        Lift.setPower(0.5);
+        Lift.setTargetPosition(1150);
+        Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        Lift.setPower(-0.5);
+        //while (Lift.isBusy()) {
+        telemetry.addData("Current Position", Lift.getCurrentPosition());
+        telemetry.addData("Target Position", Lift.getTargetPosition());
+        telemetry.addData("Current Position", Lift2.getCurrentPosition());
+        telemetry.addData("Target Position", Lift2.getTargetPosition());
+        telemetry.update();
+        //}
+    }
+    public void bringliftDown(){
+        //Bring the lift down
+        Lift.setTargetPosition(0);
+        Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        Lift.setPower(liftPow);
+        Lift2.setTargetPosition(0);
+        Lift2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        Lift2.setPower(-1 * liftPow);
+        //while (Lift.isBusy()) {
+        telemetry.addData("Current Position", Lift.getCurrentPosition());
+        telemetry.addData("Target Position", Lift.getTargetPosition());
+        telemetry.addData("Current Position", Lift2.getCurrentPosition());
+        telemetry.addData("Target Position", Lift2.getTargetPosition());
+        telemetry.update();
+        //}
+    }
   }

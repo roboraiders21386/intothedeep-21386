@@ -44,7 +44,7 @@ import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
 /**
  * Autonomous  for only vision detection using OpenCV VisionPortal and park
  */
-@Autonomous(name = "Auton-Left", group = "00-Autonomous", preselectTeleOp = "TeleOpPS5")
+@Autonomous(name = "Auton-Left Meet 2", group = "00-Autonomous", preselectTeleOp = "TeleOpPS5")
 public class AUTON_LEFT extends LinearOpMode {
 
     public static String TEAM_NAME = "Tx-Rx"; //TODO: Enter team Name
@@ -52,9 +52,13 @@ public class AUTON_LEFT extends LinearOpMode {
 
     private Servo specimen;
     private DcMotor Lift;
+    private DcMotor Lift2;
+    private Servo Rotation;
+    private Servo sample;
+    private Servo Wrist;
     private int SPECIMEN_LIFT = 2000;
     private double OPEN_SPECIMEN_CLAW = 0.5;
-    private double CLOSE_SPECIMEN_CLAW = 0.8;
+    private double CLOSE_SPECIMEN_CLAW = 0.77;
     private double liftPow = 0.5;
 
     //Define and declare Robot Starting Locations
@@ -104,7 +108,7 @@ public class AUTON_LEFT extends LinearOpMode {
         //initPose -> midwayPose 1 -> specimenDropPose -> midwayPose2 -> parkPose
         initPose = new Pose2d(0, 0, Math.toRadians(0)); //Starting pose
         midwayPose1 = new Pose2d(20, 0, Math.toRadians(0));
-        specimenDropPose = new Pose2d(30,-5,0); //changed from 28 to 30
+        specimenDropPose = new Pose2d(35,-5,0); //changed from 28 to 30
         midwayPose2 = new Pose2d(10, -18, Math.toRadians(45));
         waitSecondsBeforeDrop = 2; //TODO: Adjust time to wait for alliance partner to move from board
         parkPose = new Pose2d(5, -50, Math.toRadians(0));  //changed from 90 to 0 to face forward
@@ -122,7 +126,7 @@ public class AUTON_LEFT extends LinearOpMode {
                 drive.actionBuilder(drive.pose)
                         .strafeToLinearHeading(midwayPose1.position, midwayPose1.heading)
                         .build());
-        
+
         safeWaitSeconds((0.5));
 
         //TODO : Code to raise slide and drop specimen
@@ -212,4 +216,4 @@ public class AUTON_LEFT extends LinearOpMode {
         }
     }
 
-  }
+}

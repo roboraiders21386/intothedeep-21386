@@ -1,18 +1,12 @@
 package org.firstinspires.ftc.teamcode.opmodes.TELEOP;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
-import org.firstinspires.ftc.robotcore.external.navigation.Rotation;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 @TeleOp
-public class TeleOpPS5Meet2 extends LinearOpMode {
+public class TeleOpPS5Meet2ANDROIDSTUDIO extends LinearOpMode {
     private DcMotor Lift;
     private DcMotor Lift2;
     private DcMotor RF;

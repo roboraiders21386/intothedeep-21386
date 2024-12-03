@@ -34,6 +34,7 @@ import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.SECONDS;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -44,6 +45,7 @@ import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
 /**
  * Autonomous  for only vision detection using OpenCV VisionPortal and park
  */
+@Disabled
 @Autonomous(name = "Auton-Left Meet 1", group = "00-Autonomous", preselectTeleOp = "TeleOpPS5")
 public class AUTON_LEFTMEET1 extends LinearOpMode {
 

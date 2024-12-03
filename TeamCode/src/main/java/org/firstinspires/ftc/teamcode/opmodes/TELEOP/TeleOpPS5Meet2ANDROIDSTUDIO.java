@@ -1,11 +1,12 @@
 package org.firstinspires.ftc.teamcode.opmodes.TELEOP;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp
+@TeleOp(name = "what are you looking at do your job")
 public class TeleOpPS5Meet2ANDROIDSTUDIO extends LinearOpMode {
     private DcMotor Lift;
     private DcMotor Lift2;

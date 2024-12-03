@@ -61,15 +61,6 @@ public class AUTONRIGHT_SAMPLECLAW extends LinearOpMode {
     private double CLOSE_SPECIMEN_CLAW = 0.77;
     private double liftPow = 0.5;
 
-    //Define and declare Robot Starting Locations
-    public enum START_POSITION{
-        BLUE_LEFT,
-        BLUE_RIGHT,
-        RED_LEFT,
-        RED_RIGHT
-    }
-    public static START_POSITION startPosition;
-
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -93,7 +84,7 @@ public class AUTONRIGHT_SAMPLECLAW extends LinearOpMode {
 
         //Key Pay inputs to selecting Starting Position of robot
 
-        telemetry.addData("Selected Starting Position", startPosition);
+
         waitForStart();
 
         //Game Play Button  is pressed
@@ -129,7 +120,7 @@ public class AUTONRIGHT_SAMPLECLAW extends LinearOpMode {
         parkPose = new Pose2d(5, -50, Math.toRadians(0));  //changed from 90 to 0 to face forward
         Pose2d specimenDropPose2 = new Pose2d(35, 14, 0);
         drive = new MecanumDrive(hardwareMap, initPose);
-        Pose2d specimenDropPose3 = new Pose2d(35, 14, 0);
+
 
         //Start with the Specimen claw closed and Rotation set
         //specimen.setPosition(CLOSE_SPECIMEN_CLAW);

@@ -102,15 +102,15 @@ public class AUTON_LEFT extends LinearOpMode {
         //initPose -> midwayPose 1 -> specimenDropPose -> pickSamplePose --> sampleDropPose --> midwayPose2 --> parkPose
         initPose = new Pose2d(0, 0, Math.toRadians(0)); //Starting pose
         midwayPose1 = new Pose2d(14, 40, Math.toRadians(0));
-        specimenDropPose = new Pose2d(35,-12,0); //changed from 28 to 30
         midwayPose2 = new Pose2d(10, -12, Math.toRadians(0));
-        pickSamplePose = new Pose2d(17,40, Math.toRadians(0)); //TODO: Do splineToConstantHeading
-        Pose2d sampleDropPose = new Pose2d(0, 46, Math.toRadians(-45));
-        Pose2d pickSamplePose2 = new Pose2d(17,48, Math.toRadians(0));
-        Pose2d pickSamplePose3 = new Pose2d(19.5,53, Math.toRadians(20));
+        pickSamplePose = new Pose2d(16.5,38, Math.toRadians(0)); //TODO: Do splineToConstantHeading
+        Pose2d sampleDropPose = new Pose2d(0, 45.5, Math.toRadians(-45));
+        Pose2d sampleDropPoseFloor = new Pose2d(0, 43, Math.toRadians(-45));
+        Pose2d pickSamplePose2 = new Pose2d(16.5,48, Math.toRadians(0));
+        Pose2d pickSamplePose3 = new Pose2d(19,53, Math.toRadians(20));
         waitSecondsBeforeDrop = 2; //TODO: Adjust time to wait for alliance partner to move from board
-        parkPose = new Pose2d(53, 20, Math.toRadians(-90));//changed from 90 to 0 to face forward
-        Pose2d parkPose2 = new Pose2d(53, 12, Math.toRadians(-90));
+        parkPose = new Pose2d(60, 30, Math.toRadians(-90));//changed from 90 to 0 to face forward
+        Pose2d parkPose2 = new Pose2d(60, 15, Math.toRadians(-90));
         drive = new MecanumDrive(hardwareMap, initPose);
 
         //Start with everything set
@@ -147,7 +147,7 @@ public class AUTON_LEFT extends LinearOpMode {
         raiseLift();
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(sampleDropPose.position, sampleDropPose.heading)
+                        .strafeToLinearHeading(sampleDropPoseFloor.position, sampleDropPose.heading)
                         .build());
         scoreHighBasket();
         safeWaitSeconds(0.25);
@@ -168,7 +168,7 @@ public class AUTON_LEFT extends LinearOpMode {
         raiseLift();
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(sampleDropPose.position, sampleDropPose.heading)
+                        .strafeToLinearHeading(sampleDropPoseFloor.position, sampleDropPose.heading)
                         .build());
         scoreHighBasket();
         safeWaitSeconds(1);
@@ -189,7 +189,7 @@ public class AUTON_LEFT extends LinearOpMode {
 
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(sampleDropPose.position, sampleDropPose.heading)
+                        .strafeToLinearHeading(sampleDropPoseFloor.position, sampleDropPose.heading)
                         .build());
         scoreHighBasket();
         safeWaitSeconds(0.25);
@@ -199,12 +199,11 @@ public class AUTON_LEFT extends LinearOpMode {
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         //TODO: after samples go here
-                        .splineToSplineHeading(parkPose, Math.tan(Math.toRadians(-90)))
+                        .strafeToLinearHeading(parkPose.position, parkPose.heading)
                         .build());
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
-                        //TODO: after samples go here
-                        .splineToSplineHeading(parkPose2, Math.tan(Math.toRadians(-90)))
+                        .strafeToLinearHeading(parkPose2.position, parkPose2.heading)
                         .build());
 
 

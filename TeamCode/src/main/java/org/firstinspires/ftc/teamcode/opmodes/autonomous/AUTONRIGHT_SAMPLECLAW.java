@@ -35,7 +35,6 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -51,15 +50,16 @@ public class AUTONRIGHT_SAMPLECLAW extends LinearOpMode {
     public static int TEAM_NUMBER = 21386; //TODO: Enter team Number
 
     private Servo specimen;
-    private DcMotor Lift;
-    private DcMotor Lift2;
+    // private DcMotor Lift;
+    //private DcMotor Lift2;
     private Servo Rotation;
     private Servo sample;
     private Servo Wrist;
-    private int SPECIMEN_LIFT = 2000;
+    private Servo swap;
+    private int SPECIMEN_Lift = 2000;
     private double OPEN_SPECIMEN_CLAW = 0.5;
     private double CLOSE_SPECIMEN_CLAW = 0.77;
-    private double liftPow = 0.875;
+    private double LiftPow = 0.875;
 
 
     @Override
@@ -73,17 +73,18 @@ public class AUTONRIGHT_SAMPLECLAW extends LinearOpMode {
         Rotation = hardwareMap.get(Servo.class, "rotate");
         Wrist = hardwareMap.get(Servo.class, "wrist");
 
-        //Lift: Initialize lift
-        Lift = hardwareMap.get(DcMotor.class, "lift");
-        Lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        Lift.setDirection(DcMotor.Direction.REVERSE);
+        //Lift: Initialize Lift
+        //Lift = hardwareMap.get(DcMotor.class, "Lift");
+        //Lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //Lift.setDirection(DcMotor.Direction.REVERSE);
         //Lift2: Initialize
-        Lift2 = hardwareMap.get(DcMotor.class, "lift2");
-        Lift2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        Lift2.setDirection(DcMotor.Direction.FORWARD);
-
+        //Lift2 = hardwareMap.get(DcMotor.class, "Lift2");
+        //Lift2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //Lift2.setDirection(DcMotor.Direction.FORWARD);
+        sample.setPosition(0);
         //Key Pay inputs to selecting Starting Position of robot
-
+        swap = hardwareMap.get(Servo.class, "switch");
+        swap.setPosition(0.5);
 
         waitForStart();
 
@@ -110,11 +111,11 @@ public class AUTONRIGHT_SAMPLECLAW extends LinearOpMode {
         //initPose -> midwayPose 1 -> specimenDropPose -> midwayPose2 -> parkPose
         initPose = new Pose2d(0, 0, Math.toRadians(0)); //Starting pose
         midwayPose1 = new Pose2d(20, 5, Math.toRadians(0));
-        specimenDropPose = new Pose2d(35.5,18,0); //changed from 28 to 30
-        midwayPose2 = new Pose2d(10, -12, Math.toRadians(0));
+        specimenDropPose = new Pose2d(35.5,21,0); //changed from 28 to 30
+        midwayPose2 = new Pose2d(3, -12, Math.toRadians(0));
         pickSamplePose = new Pose2d(21,-46.75, Math.toRadians(0));
         Pose2d pickSamplePose2 = new Pose2d(21,-57, Math.toRadians(0));
-        pickSpecimen = new Pose2d(12.5,-46.75, Math.toRadians(0));
+        pickSpecimen = new Pose2d(10,-46.75, Math.toRadians(0));
         //pickSpecimen = new Pose2d(4,-45.5 , Math.toRadians(0));
         Pose2d pickSpecimenPose2 = new Pose2d(15,-45, Math.toRadians(0));
         waitSecondsBeforeDrop = 2; //TODO: Adjust time to wait for alliance partner to move from board
@@ -126,17 +127,18 @@ public class AUTONRIGHT_SAMPLECLAW extends LinearOpMode {
         //Start with the claw closed and Rotation set
         //specimen.setPosition(CLOSE_SPECIMEN_CLAW);
         sample.setPosition(0);
-        Wrist.setPosition(0);
-        Rotation.setPosition(0.16);
+        Wrist.setPosition(0.2);
+        swap.setPosition(0.5);
+        Rotation.setPosition(0.202);
 
 
         //dropSpecimen();
-        Lift.setTargetPosition(800);
+       /* Lift.setTargetPosition(400);
         Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        Lift.setPower(liftPow);
-        Lift2.setTargetPosition(800);
+        Lift.setPower(LiftPow);
+        Lift2.setTargetPosition(400);
         Lift2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        Lift2.setPower(-1 * liftPow);
+        Lift2.setPower(-1 * LiftPow);
         //while (Lift.isBusy()) {
         telemetry.addData("Current Position", Lift.getCurrentPosition());
         telemetry.addData("Target Position", Lift.getTargetPosition());
@@ -145,10 +147,14 @@ public class AUTONRIGHT_SAMPLECLAW extends LinearOpMode {
         telemetry.update();
         //safeWaitSeconds(1);
         //Move to midwayPose1
-        Actions.runBlocking(
+
+        */
+       /* Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         .strafeToLinearHeading(midwayPose1.position, midwayPose1.heading)
                         .build());
+
+        */
 
         //Lift.setPower(0);
         //safeWaitSeconds(0.5);
@@ -161,39 +167,42 @@ public class AUTONRIGHT_SAMPLECLAW extends LinearOpMode {
                         .strafeToLinearHeading(specimenDropPose.position, specimenDropPose.heading)
                         .build());
         //lowerLift();
-        Rotation.setPosition(0.167);
+        Rotation.setPosition(0.202);
         safeWaitSeconds(0.75);
-        Lift.setTargetPosition(1250);
+        /*Lift.setTargetPosition(1250);
         Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        Lift.setPower(liftPow);
+        Lift.setPower(LiftPow);
         Lift2.setTargetPosition(1250);
         Lift2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        Lift2.setPower(-1 * liftPow);
+        Lift2.setPower(-1 * LiftPow);
         //while (Lift.isBusy()) {
         telemetry.addData("Current Position", Lift.getCurrentPosition());
         telemetry.addData("Target Position", Lift.getTargetPosition());
         telemetry.addData("Current Position", Lift2.getCurrentPosition());
         telemetry.addData("Target Position", Lift2.getTargetPosition());
         telemetry.update();
-        safeWaitSeconds(0.75);
+
+         */
+
+
         sample.setPosition(0.3);
 
-        bringliftDown();
+        //bringLiftDown();
         safeWaitSeconds(0.5);
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         .strafeToLinearHeading(pickSamplePose.position, pickSamplePose.heading)
                         .build());
         Rotation.setPosition(0.34);
-        safeWaitSeconds(1);
+        safeWaitSeconds(1.25);
         sample.setPosition(0);
         safeWaitSeconds(1);
         Rotation.setPosition(0.04);
         safeWaitSeconds(1);
         Wrist.setPosition(0.85);
-        safeWaitSeconds(1);
+        safeWaitSeconds(1.25);
         sample.setPosition(0.3);
-        safeWaitSeconds(1);
+        safeWaitSeconds(1.25);
         /*
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
@@ -212,6 +221,8 @@ public class AUTONRIGHT_SAMPLECLAW extends LinearOpMode {
         safeWaitSeconds(1);
 
          */
+        //Rotation.setPosition(0.04);
+        safeWaitSeconds(0.5);
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         .strafeToLinearHeading(pickSpecimen.position, pickSpecimen.heading)
@@ -228,18 +239,20 @@ public class AUTONRIGHT_SAMPLECLAW extends LinearOpMode {
 
         Rotation.setPosition(0.16);
         //lowerLift();
-        Lift.setTargetPosition(400);
+        /*Lift.setTargetPosition(400);
         Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        Lift.setPower(liftPow);
+        Lift.setPower(LiftPow);
         Lift2.setTargetPosition(400);
         Lift2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        Lift2.setPower(-1 * liftPow);
+        Lift2.setPower(-1 * LiftPow);
         //while (Lift.isBusy()) {
         telemetry.addData("Current Position", Lift.getCurrentPosition());
         telemetry.addData("Target Position", Lift.getTargetPosition());
         telemetry.addData("Current Position", Lift2.getCurrentPosition());
         telemetry.addData("Target Position", Lift2.getTargetPosition());
         telemetry.update();
+
+         */
 
         safeWaitSeconds(0.25);
         Actions.runBlocking(
@@ -250,18 +263,20 @@ public class AUTONRIGHT_SAMPLECLAW extends LinearOpMode {
 
         Rotation.setPosition(0.167);
         safeWaitSeconds(0.75);
-        Lift.setTargetPosition(1250);
+        /*Lift.setTargetPosition(1250);
         Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        Lift.setPower(liftPow);
+        Lift.setPower(LiftPow);
         Lift2.setTargetPosition(1250);
         Lift2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        Lift2.setPower(-1 * liftPow);
+        Lift2.setPower(-1 * LiftPow);
         //while (Lift.isBusy()) {
         telemetry.addData("Current Position", Lift.getCurrentPosition());
         telemetry.addData("Target Position", Lift.getTargetPosition());
         telemetry.addData("Current Position", Lift2.getCurrentPosition());
         telemetry.addData("Target Position", Lift2.getTargetPosition());
         telemetry.update();
+
+         */
 
         safeWaitSeconds(0.5);
         sample.setPosition(0.3);
@@ -273,7 +288,7 @@ public class AUTONRIGHT_SAMPLECLAW extends LinearOpMode {
                         //TODO: after specimen go here
                         .strafeToLinearHeading(midwayPose2.position, midwayPose2.heading)
                         .build());
-        bringliftDown();
+        //bringLiftDown();
 
         //Move robot to park in Observation Zone
         Actions.runBlocking(
@@ -294,26 +309,31 @@ public class AUTONRIGHT_SAMPLECLAW extends LinearOpMode {
         while (!isStopRequested() && timer.time() < time) {
         }
     }
-    //lift functions
+    //Lift functions
     public void dropSpecimen(){
+        Rotation.setPosition(0.2172);
+        Wrist.setPosition(0.6);
+        /*
         //TODO : Code to raise slide and drop specimen
         Lift.setTargetPosition(2000);
         Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        Lift.setPower(liftPow);
+        Lift.setPower(LiftPow);
         Lift2.setTargetPosition(2000);
         Lift2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        Lift2.setPower(-1 * liftPow);
+        Lift2.setPower(-1 * LiftPow);
         //while (Lift.isBusy()) {
         telemetry.addData("Current Position", Lift.getCurrentPosition());
         telemetry.addData("Target Position", Lift.getTargetPosition());
         telemetry.addData("Current Position", Lift2.getCurrentPosition());
         telemetry.addData("Target Position", Lift2.getTargetPosition());
         telemetry.update();
+        
+         */
         //}
     }
     public void lowerLift(){
-        //Lower lift
-        Lift.setTargetPosition(1250);
+        //Lower Lift
+        /*Lift.setTargetPosition(1250);
         Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         Lift.setPower(0.5);
         Lift.setTargetPosition(1250);
@@ -327,14 +347,16 @@ public class AUTONRIGHT_SAMPLECLAW extends LinearOpMode {
         telemetry.update();
         //}
     }
-    public void bringliftDown(){
-        //Bring the lift down
+    public void bringLiftDown(){
+        //Bring the Lift down
+        Rotation.setPosition(0.15);
+        safeWaitSeconds(0.5);
         Lift.setTargetPosition(0);
         Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        Lift.setPower(liftPow);
+        Lift.setPower(LiftPow);
         Lift2.setTargetPosition(0);
         Lift2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        Lift2.setPower(-1 * liftPow);
+        Lift2.setPower(-1 * LiftPow);
         //while (Lift.isBusy()) {
         telemetry.addData("Current Position", Lift.getCurrentPosition());
         telemetry.addData("Target Position", Lift.getTargetPosition());
@@ -342,5 +364,9 @@ public class AUTONRIGHT_SAMPLECLAW extends LinearOpMode {
         telemetry.addData("Target Position", Lift2.getTargetPosition());
         telemetry.update();
         //}
+
+         */
     }
+
+
 }

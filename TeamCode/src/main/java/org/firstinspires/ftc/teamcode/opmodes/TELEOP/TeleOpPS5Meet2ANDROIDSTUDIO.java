@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp(name = "what are you looking at do your job")
+@TeleOp(name = "TELEOPMEET2NOW")
 public class TeleOpPS5Meet2ANDROIDSTUDIO extends LinearOpMode {
     private DcMotor Lift;
     private DcMotor Lift2;

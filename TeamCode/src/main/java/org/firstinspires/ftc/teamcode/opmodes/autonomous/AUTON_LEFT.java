@@ -34,6 +34,7 @@ import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.SECONDS;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -44,7 +45,8 @@ import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
 /**
  * Autonomous  for only vision detection using OpenCV VisionPortal and park
  */
-@Autonomous(name = "Auton-Left Meet 2", group = "00-Autonomous", preselectTeleOp = "TeleOpPS5")
+
+@Autonomous(name = "backup ", group = "00-Autonomous", preselectTeleOp = "TeleOpPS5")
 public class AUTON_LEFT extends LinearOpMode {
 
     private Servo specimen;
@@ -116,7 +118,7 @@ public class AUTON_LEFT extends LinearOpMode {
         //Start with everything set
         sample.setPosition(0);
         Wrist.setPosition(0);
-        Rotation.setPosition(0.1644);
+        Rotation.setPosition(0.16);
         goBackHome();
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
@@ -138,11 +140,11 @@ public class AUTON_LEFT extends LinearOpMode {
                         .build());
 
         // TODO: pick up a sample
-        Rotation.setPosition(0.34);
+        Rotation.setPosition(0.67);
         safeWaitSeconds(1.25);
         sample.setPosition(0);
         safeWaitSeconds(0.25);
-        Rotation.setPosition(0.3);
+        Rotation.setPosition(0.6);
         safeWaitSeconds(0.5);
         raiseLift();
         Actions.runBlocking(
@@ -159,11 +161,11 @@ public class AUTON_LEFT extends LinearOpMode {
                         .build());
 
         // TODO: pick up a sample
-        Rotation.setPosition(0.34);
+        Rotation.setPosition(0.67);
         safeWaitSeconds(1.25);
         sample.setPosition(0);
         safeWaitSeconds(0.25);
-        Rotation.setPosition(0.3);
+        Rotation.setPosition(0.6);
         safeWaitSeconds(0.5);
         raiseLift();
         Actions.runBlocking(
@@ -179,11 +181,11 @@ public class AUTON_LEFT extends LinearOpMode {
                         .build());
 
         // TODO: pick up a sample
-        Rotation.setPosition(0.34);
+        Rotation.setPosition(0.67);
         safeWaitSeconds(1.25);
         sample.setPosition(0);
         safeWaitSeconds(0.25);
-        Rotation.setPosition(0.3);
+        Rotation.setPosition(0.6);
         safeWaitSeconds(0.5);
         raiseLift();
 
@@ -194,7 +196,7 @@ public class AUTON_LEFT extends LinearOpMode {
         scoreHighBasket();
         safeWaitSeconds(0.25);
         goBackHome();
-        Rotation.setPosition(0.2);
+        Rotation.setPosition(0.3);
         //Move robot to park in Observation Zone
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
